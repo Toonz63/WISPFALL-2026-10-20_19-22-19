@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 6f;
     public float jumpForce = 12f;
     public LayerMask groundLayer;
+    public int Facing = 1;
 
     Rigidbody2D rb;
     BoxCollider2D col;
@@ -26,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
         if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) x += 1f;
 
         rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
+        if (x != 0) Facing = x > 0 ? 1 : -1;
 
         if (kb.spaceKey.wasPressedThisFrame && IsGrounded())
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
