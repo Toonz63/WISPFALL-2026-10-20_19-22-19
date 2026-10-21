@@ -12,6 +12,7 @@ public class PauseMenu : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.Instance != null && GameManager.Instance.gameOver) return;
         var kb = Keyboard.current;
         if (kb != null && kb.escapeKey.wasPressedThisFrame) SetPaused(!paused);
     }
@@ -31,7 +32,7 @@ public class PauseMenu : MonoBehaviour
         helpPanel.SetActive(showHelp);
         pausePanel.SetActive(!showHelp);
     }
-    
+
     public void MainMenu()
     {
         Time.timeScale = 1f;

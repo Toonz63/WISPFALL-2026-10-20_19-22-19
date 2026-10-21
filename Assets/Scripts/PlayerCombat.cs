@@ -22,6 +22,7 @@ public class PlayerCombat : MonoBehaviour
     void Update()
     {
         if (Time.timeScale == 0f) return;
+
         var kb = Keyboard.current;
         var mouse = Mouse.current;
         bool pressed = (kb != null && kb.jKey.wasPressedThisFrame) ||
@@ -43,6 +44,9 @@ public class PlayerCombat : MonoBehaviour
         {
             Husk h = hit.GetComponent<Husk>();
             if (h != null) h.TakeHit(damage, transform.position.x);
+
+            Keeper k = hit.GetComponent<Keeper>();
+            if (k != null) k.TakeHit(damage, transform.position.x);
         }
 
         if (slashVisual) StartCoroutine(ShowSlash(center));
