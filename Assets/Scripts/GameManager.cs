@@ -39,6 +39,15 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
+    public void Respawn()
+    {
+        gameOver = false;
+        losePanel.SetActive(false);
+        Time.timeScale = 1f;
+        Health h = FindFirstObjectByType<Health>();
+        if (h != null) h.Respawn();
+    }
+
     public void MainMenu()
     {
         Time.timeScale = 1f;

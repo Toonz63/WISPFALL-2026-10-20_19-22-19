@@ -2380,7 +2380,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Retry
+  m_text: 'Respawn
 
 '
   m_isRightToLeft: 0
@@ -3858,6 +3858,8 @@ MonoBehaviour:
 
     Esc - Pause
 
+    Q - Use a Vow Flame (heals half your health).
+
 
 
     Avoid spikes. Watch for an Husk''s orange flash, it means there about to attack'
@@ -4028,7 +4030,7 @@ GameObject:
   - component: {fileID: 1415489773}
   - component: {fileID: 1415489772}
   m_Layer: 5
-  m_Name: PlayAgainButton
+  m_Name: RespawnButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4100,7 +4102,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 140773102}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: Retry
+        m_MethodName: Respawn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4615,8 +4617,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 175, y: -75}
-  m_SizeDelta: {x: 300, y: 50}
+  m_AnchoredPosition: {x: 200, y: -75}
+  m_SizeDelta: {x: 350, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1545818512
 MonoBehaviour:
@@ -4923,9 +4925,10 @@ MonoBehaviour:
   maxHealth: 100
   invincibleTime: 0.8
   killY: -15
-  lives: 3
+  maxFlasks: 3
+  flaskHealPercent: 0.5
   healthBar: {fileID: 1435385402}
-  livesText: {fileID: 1545818512}
+  flaskText: {fileID: 1545818512}
 --- !u!114 &1574530701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5396,7 +5399,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: THE LIGHT FADES... Your Vow Flames are gone.
+  m_text: THE LIGHT FADES... YOU DIED.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

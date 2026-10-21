@@ -1196,7 +1196,7 @@ MonoBehaviour:
 
     Goal: Defeat the Sunken Keeper in the Chapel.
 
-    
+
 
     A / D or Arrows - Move
 
@@ -1208,7 +1208,9 @@ MonoBehaviour:
 
     Esc - Pause
 
-    
+    Q - Use a Vow Flame (heals half your health).
+
+
 
     Avoid spikes. Watch for an Husk''s orange flash, it means there about to attack'
   m_isRightToLeft: 0

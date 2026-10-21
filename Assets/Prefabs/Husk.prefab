@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 9190200796332622496}
   - component: {fileID: 3870937658120130381}
   - component: {fileID: 6196156526435814805}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Husk
   m_TagString: Untagged
   m_Icon: {fileID: 0}

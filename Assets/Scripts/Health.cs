@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using TMPro;
 
 public class Health : MonoBehaviour
@@ -7,11 +8,13 @@ public class Health : MonoBehaviour
     public int maxHealth = 100;
     public float invincibleTime = 0.8f;
     public float killY = -15f;
-    public int lives = 3;
+    public int maxFlasks = 3;
+    [Range(0f, 1f)] public float flaskHealPercent = 0.5f;
     public Slider healthBar;
-    public TMP_Text livesText;
+    public TMP_Text flaskText;
 
     int current;
+    int flasks;
     float invincibleUntil;
     Vector3 respawnPoint;
     Rigidbody2D rb;
@@ -23,13 +26,19 @@ public class Health : MonoBehaviour
     {
         respawnPoint = transform.position;
         current = maxHealth;
+        flasks = maxFlasks;
         UpdateBar();
-        UpdateLives();
+        UpdateFlasks();
     }
 
     void Update()
     {
-        if (!dead && transform.position.y < killY) Die();
+        if (dead || Time.timeScale == 0f) return;
+
+        if (transform.position.y < killY) { Die(); return; }
+
+        var kb = Keyboard.current;
+        if (kb != null && kb.qKey.wasPressedThisFrame) UseFlask();
     }
 
     public void SetCheckpoint(Vector3 pos) { respawnPoint = pos; }
@@ -43,16 +52,22 @@ public class Health : MonoBehaviour
         if (current == 0) Die();
     }
 
-    public void Heal(int amount)
+    public void UseFlask()
     {
-        current = Mathf.Min(maxHealth, current + amount);
+        if (dead || flasks <= 0 || current >= maxHealth) return;
+        flasks--;
+        current = Mathf.Min(maxHealth, current + Mathf.RoundToInt(maxHealth * flaskHealPercent));
         UpdateBar();
+        UpdateFlasks();
     }
 
-    public void FullHeal()
+    // Called by the shrine: full health and full flasks, repeatable
+    public void Rest()
     {
         current = maxHealth;
+        flasks = maxFlasks;
         UpdateBar();
+        UpdateFlasks();
     }
 
     void UpdateBar()
@@ -64,30 +79,29 @@ public class Health : MonoBehaviour
         }
     }
 
-    void UpdateLives()
+    void UpdateFlasks()
     {
-        if (livesText != null) livesText.text = "Vow Flames: " + lives;
+        if (flaskText != null) flaskText.text = "Vow Flames: " + flasks + "/" + maxFlasks + "  [Q]";
     }
 
     void Die()
     {
         if (dead) return;
-        lives--;
-        UpdateLives();
+        dead = true;
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+        if (GameManager.Instance != null) GameManager.Instance.Lose();
+    }
 
-        if (lives <= 0)
-        {
-            dead = true;
-            if (GameManager.Instance != null) GameManager.Instance.Lose();
-            return;
-        }
+    // Called by the Respawn button on the Lose screen
+    public void Respawn()
+    {
+        dead = false;
+        transform.position = respawnPoint;
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+        Rest();
+        invincibleUntil = Time.time + 1f;
 
         Keeper boss = FindFirstObjectByType<Keeper>();
         if (boss != null) boss.ResetBoss();
-        transform.position = respawnPoint;
-        if (rb != null) rb.linearVelocity = Vector2.zero;
-        current = maxHealth;
-        invincibleUntil = Time.time + 1f;
-        UpdateBar();
     }
 }

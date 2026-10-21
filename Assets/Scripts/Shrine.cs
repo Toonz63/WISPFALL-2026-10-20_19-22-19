@@ -22,7 +22,7 @@ public class Shrine : MonoBehaviour
         if (inRange && kb != null && kb.eKey.wasPressedThisFrame)
         {
             playerHealth.SetCheckpoint(transform.position + Vector3.up * 1f);
-            playerHealth.FullHeal();
+            playerHealth.Rest();
             sr.color = activeColor;
         }
     }
