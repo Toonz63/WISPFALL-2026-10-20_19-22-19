@@ -21,6 +21,7 @@ public class PlayerCombat : MonoBehaviour
 
     void Update()
     {
+        if (Time.timeScale == 0f) return;
         var kb = Keyboard.current;
         var mouse = Mouse.current;
         bool pressed = (kb != null && kb.jKey.wasPressedThisFrame) ||
