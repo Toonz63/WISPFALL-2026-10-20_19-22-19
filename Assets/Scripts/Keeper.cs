@@ -7,7 +7,6 @@ public class Keeper : MonoBehaviour
     enum State { Dormant, Chase, Telegraph, Lunge, Recover, Dead }
 
     public int maxHealth = 15;
-    public float wakeRange = 9f;
     public float chaseSpeed = 2.5f;
     public float attackRange = 4f;
     public float telegraphTime = 0.7f;
@@ -22,6 +21,7 @@ public class Keeper : MonoBehaviour
     SpriteRenderer sr;
     Transform player;
     Color baseColor;
+    Color originalColor;
     State state = State.Dormant;
     int health;
     float stateEnd;
@@ -29,7 +29,11 @@ public class Keeper : MonoBehaviour
     bool dealtDamage;
     bool phase2;
     Vector3 startPos;
-    Color originalColor;
+
+    public bool IsAwake
+    {
+        get { return state != State.Dormant && state != State.Dead; }
+    }
 
     void Awake()
     {
@@ -44,6 +48,14 @@ public class Keeper : MonoBehaviour
         if (bossBarRoot != null) bossBarRoot.SetActive(false);
     }
 
+    public void Wake()
+    {
+        if (state != State.Dormant) return;
+        state = State.Chase;
+        if (bossBarRoot != null) bossBarRoot.SetActive(true);
+        UpdateBar();
+    }
+
     void Update()
     {
         if (player == null || state == State.Dead) return;
@@ -53,13 +65,7 @@ public class Keeper : MonoBehaviour
         switch (state)
         {
             case State.Dormant:
-                if (dist <= wakeRange)
-                {
-                    state = State.Chase;
-                    if (bossBarRoot != null) bossBarRoot.SetActive(true);
-                    UpdateBar();
-                }
-                break;
+                break;   // sleeps until BossArena wakes it
 
             case State.Chase:
                 dir = player.position.x >= transform.position.x ? 1 : -1;
@@ -117,11 +123,7 @@ public class Keeper : MonoBehaviour
     public void TakeHit(int dmg, float attackerX)
     {
         if (state == State.Dead) return;
-        if (state == State.Dormant)
-        {
-            state = State.Chase;
-            if (bossBarRoot != null) bossBarRoot.SetActive(true);
-        }
+        Wake();
 
         health -= dmg;
         UpdateBar();
