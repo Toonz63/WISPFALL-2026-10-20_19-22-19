@@ -1,20 +1,38 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 public class Health : MonoBehaviour
 {
     public int maxHealth = 100;
     public float invincibleTime = 0.8f;
+    public float killY = -15f;
     public Slider healthBar;
 
     int current;
     float invincibleUntil;
+    Vector3 respawnPoint;
+    Rigidbody2D rb;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
 
     void Start()
     {
+        respawnPoint = transform.position;
         current = maxHealth;
         UpdateBar();
+    }
+
+    void Update()
+    {
+        if (transform.position.y < killY) Die();
+    }
+
+    public void SetCheckpoint(Vector3 pos)
+    {
+        respawnPoint = pos;
     }
 
     public void TakeDamage(int amount)
@@ -32,6 +50,12 @@ public class Health : MonoBehaviour
         UpdateBar();
     }
 
+    public void FullHeal()
+    {
+        current = maxHealth;
+        UpdateBar();
+    }
+
     void UpdateBar()
     {
         if (healthBar != null)
@@ -43,7 +67,10 @@ public class Health : MonoBehaviour
 
     void Die()
     {
-        // Temporary: reload the scene. We'll replace this with Lose / respawn later.
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        transform.position = respawnPoint;
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+        current = maxHealth;
+        invincibleUntil = Time.time + 1f;
+        UpdateBar();
     }
 }
