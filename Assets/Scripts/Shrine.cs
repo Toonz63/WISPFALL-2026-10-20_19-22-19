@@ -1,19 +1,22 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+using UnityEngine;
+using UnityEngine.InputSystem;
+
 public class Shrine : MonoBehaviour
 {
     public Color activeColor = new Color(1f, 0.85f, 0.3f);
     public Color idleColor = new Color(0.5f, 0.5f, 0.5f);
 
     Health playerHealth;
-    SpriteRenderer sr;
+    SpriteRenderer[] renderers;
     bool inRange;
 
     void Awake()
     {
-        sr = GetComponent<SpriteRenderer>();
-        sr.color = idleColor;
+        renderers = GetComponentsInChildren<SpriteRenderer>();
+        SetColor(idleColor);
     }
 
     void Update()
@@ -21,10 +24,15 @@ public class Shrine : MonoBehaviour
         var kb = Keyboard.current;
         if (inRange && kb != null && kb.eKey.wasPressedThisFrame)
         {
-            playerHealth.SetCheckpoint(transform.position + Vector3.up * 1f);
+            playerHealth.SetCheckpoint(transform.position + new Vector3(-1.5f, 1f, 0f));
             playerHealth.Rest();
-            sr.color = activeColor;
+            SetColor(activeColor);
         }
+    }
+
+    void SetColor(Color c)
+    {
+        foreach (var r in renderers) r.color = c;
     }
 
     void OnTriggerEnter2D(Collider2D other)
