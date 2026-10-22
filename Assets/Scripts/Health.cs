@@ -45,6 +45,7 @@ public class Health : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        AudioManager.Hurt();
         if (dead || Time.time < invincibleUntil) return;
         invincibleUntil = Time.time + invincibleTime;
         current = Mathf.Max(0, current - amount);
@@ -64,6 +65,7 @@ public class Health : MonoBehaviour
     // Called by the shrine: full health and full flasks, repeatable
     public void Rest()
     {
+        AudioManager.Shrine();
         PlayerCombat pc = GetComponent<PlayerCombat>();
         if (pc != null) pc.ResetBonus();
         current = maxHealth;
@@ -83,6 +85,7 @@ public class Health : MonoBehaviour
 
     void UpdateFlasks()
     {
+        AudioManager.Shrine();
         if (flaskText != null) flaskText.text = "Vow Flames: " + flasks + "/" + maxFlasks + "  [Q]";
     }
 

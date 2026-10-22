@@ -92,6 +92,7 @@ public class PlayerCombat : MonoBehaviour
 
     void Attack()
     {
+        AudioManager.Swing();
         if (pa != null) pa.PlayAttack();
 
         Vector2 center = SlashCenter();

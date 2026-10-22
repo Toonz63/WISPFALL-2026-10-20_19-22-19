@@ -129,6 +129,7 @@ public class Husk : MonoBehaviour
 
     public void TakeHit(float dmg, float attackerX)
     {
+        AudioManager.Hit();
         if (state == State.Dead) return;
         health -= dmg;
 

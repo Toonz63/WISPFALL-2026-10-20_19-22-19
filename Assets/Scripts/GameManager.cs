@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
 
     public void Win()
     {
+        AudioManager.Win();
         if (gameOver) return;
         gameOver = true;
         winPanel.SetActive(true);
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour
 
     public void Lose()
     {
+        AudioManager.Lose();
         if (gameOver) return;
         gameOver = true;
         losePanel.SetActive(true);

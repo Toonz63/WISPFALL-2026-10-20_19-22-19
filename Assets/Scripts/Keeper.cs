@@ -124,6 +124,7 @@ public class Keeper : MonoBehaviour
 
     public void TakeHit(float dmg, float attackerX)
     {
+        AudioManager.Hit();
         if (state == State.Dead) return;
         Wake();
 
