@@ -5,7 +5,7 @@ public class Husk : MonoBehaviour
 {
     enum State { Patrol, Telegraph, Lunge, Recover, Dead }
 
-    public int health = 3;
+    public float health = 6;
     public float patrolSpeed = 2f;
     public float patrolRange = 3f;
     public float aggroRange = 4f;
@@ -18,18 +18,21 @@ public class Husk : MonoBehaviour
     Rigidbody2D rb;
     SpriteRenderer sr;
     Transform player;
+    Collider2D col;
     Color baseColor;
     State state = State.Patrol;
     float startX, stateEnd;
     int dir = 1;
     bool dealtDamage;
+    LayerMask groundMask;
 
-    int startHealth;
+    float startHealth;
     Vector3 startPos;
     Vector3 startScale;
 
     void Awake()
     {
+        col = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         baseColor = sr.color;
@@ -37,8 +40,29 @@ public class Husk : MonoBehaviour
         startHealth = health;
         startPos = transform.position;
         startScale = transform.localScale;
+        groundMask = LayerMask.GetMask("Ground");
         GameObject p = GameObject.FindWithTag("Player");
         if (p != null) player = p.transform;
+    }
+
+    // true if the next step would walk off a ledge, into a wall, or onto a spike
+    bool Blocked()
+    {
+        Bounds b = col.bounds;
+
+        // ledge: is there ground just ahead of the feet?
+        Vector2 footAhead = new Vector2(b.center.x + dir * (b.extents.x + 0.1f), b.min.y + 0.1f);
+        if (!Physics2D.Raycast(footAhead, Vector2.down, 0.6f, groundMask)) return true;
+
+        // wall right in front
+        if (Physics2D.Raycast(b.center, new Vector2(dir, 0f), b.extents.x + 0.15f, groundMask)) return true;
+
+        // hazard (spikes) just ahead
+        Vector2 p = new Vector2(b.center.x + dir * (b.extents.x + 0.35f), b.min.y + 0.2f);
+        foreach (var c in Physics2D.OverlapCircleAll(p, 0.3f))
+            if (c.GetComponent<Hazard>() != null) return true;
+
+        return false;
     }
 
     void Update()
@@ -50,6 +74,7 @@ public class Husk : MonoBehaviour
             case State.Patrol:
                 if (transform.position.x > startX + patrolRange) dir = -1;
                 else if (transform.position.x < startX - patrolRange) dir = 1;
+                if (Blocked()) dir = -dir;
                 rb.linearVelocity = new Vector2(dir * patrolSpeed, rb.linearVelocity.y);
 
                 if (Vector2.Distance(player.position, transform.position) <= aggroRange)
@@ -73,10 +98,11 @@ public class Husk : MonoBehaviour
                 break;
 
             case State.Lunge:
-                rb.linearVelocity = new Vector2(dir * lungeSpeed, rb.linearVelocity.y);
+                float vx = Blocked() ? 0f : dir * lungeSpeed;   // won't charge off a ledge
+                rb.linearVelocity = new Vector2(vx, rb.linearVelocity.y);
                 if (!dealtDamage)
                 {
-                    foreach (var c in Physics2D.OverlapCircleAll(transform.position, 0.8f))
+                    foreach (var c in Physics2D.OverlapBoxAll(col.bounds.center, col.bounds.size, 0f))
                     {
                         if (c.CompareTag("Player"))
                         {
@@ -101,18 +127,16 @@ public class Husk : MonoBehaviour
         }
     }
 
-    public void TakeHit(int dmg, float attackerX)
+    public void TakeHit(float dmg, float attackerX)
     {
         if (state == State.Dead) return;
         health -= dmg;
 
         if (health <= 0) { StartCoroutine(Die()); return; }
 
-        // stagger + knockback (also interrupts a telegraph)
+        // stagger (also interrupts a telegraph)
         state = State.Recover;
         stateEnd = Time.time + 0.4f;
-        float push = transform.position.x >= attackerX ? 1f : -1f;
-        rb.linearVelocity = new Vector2(push * 4f, 3f);
         StartCoroutine(Flash());
     }
 
@@ -127,7 +151,7 @@ public class Husk : MonoBehaviour
     {
         state = State.Dead;
         rb.linearVelocity = Vector2.zero;
-        GetComponent<Collider2D>().enabled = false;
+        col.enabled = false;
         rb.simulated = false;
 
         float t = 0f;
@@ -140,7 +164,7 @@ public class Husk : MonoBehaviour
             yield return null;
         }
 
-        gameObject.SetActive(false);   // hidden instead of destroyed, so it can come back
+        gameObject.SetActive(false);   // hidden instead of destroyed, so it can respawn
     }
 
     // Called when the player respawns
@@ -152,7 +176,7 @@ public class Husk : MonoBehaviour
         transform.position = startPos;
         transform.localScale = startScale;
         sr.color = baseColor;
-        GetComponent<Collider2D>().enabled = true;
+        col.enabled = true;
         rb.simulated = true;
         rb.linearVelocity = Vector2.zero;
         dir = 1;

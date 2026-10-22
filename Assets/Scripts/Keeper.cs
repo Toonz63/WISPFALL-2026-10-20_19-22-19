@@ -6,7 +6,7 @@ public class Keeper : MonoBehaviour
 {
     enum State { Dormant, Chase, Telegraph, Lunge, Recover, Dead }
 
-    public int maxHealth = 15;
+    public float maxHealth = 35;
     public float chaseSpeed = 2.5f;
     public float attackRange = 4f;
     public float telegraphTime = 0.7f;
@@ -20,10 +20,11 @@ public class Keeper : MonoBehaviour
     Rigidbody2D rb;
     SpriteRenderer sr;
     Transform player;
+    Collider2D col;
     Color baseColor;
     Color originalColor;
     State state = State.Dormant;
-    int health;
+    float health;
     float stateEnd;
     int dir = 1;
     bool dealtDamage;
@@ -37,6 +38,7 @@ public class Keeper : MonoBehaviour
 
     void Awake()
     {
+        col = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         baseColor = sr.color;
@@ -95,7 +97,7 @@ public class Keeper : MonoBehaviour
                 rb.linearVelocity = new Vector2(dir * lungeSpeed, rb.linearVelocity.y);
                 if (!dealtDamage)
                 {
-                    foreach (var c in Physics2D.OverlapCircleAll(transform.position, 1.8f))
+                    foreach (var c in Physics2D.OverlapBoxAll(col.bounds.center, col.bounds.size, 0f))
                     {
                         if (c.CompareTag("Player"))
                         {
@@ -120,7 +122,7 @@ public class Keeper : MonoBehaviour
         }
     }
 
-    public void TakeHit(int dmg, float attackerX)
+    public void TakeHit(float dmg, float attackerX)
     {
         if (state == State.Dead) return;
         Wake();
@@ -159,7 +161,7 @@ public class Keeper : MonoBehaviour
     {
         state = State.Dead;
         rb.linearVelocity = Vector2.zero;
-        GetComponent<Collider2D>().enabled = false;
+        col.enabled = false;
         rb.simulated = false;
 
         float t = 0f;

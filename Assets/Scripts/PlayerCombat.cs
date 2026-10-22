@@ -1,20 +1,26 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class PlayerCombat : MonoBehaviour
 {
-    public int damage = 1;
+    public float damage = 1f;            // base damage
+    public float killBonus = 0.1f;       // gained per Husk kill
     public float attackCooldown = 0.4f;
     public Vector2 attackOffset = new Vector2(0.9f, 0f);
     public Vector2 attackSize = new Vector2(1.2f, 1f);
     public float slashDuration = 0.12f;
     public GameObject slashVisual;
+    public TMP_Text damageText;          // optional HUD text
 
     PlayerMovement move;
     PlayerAnimator pa;
     float nextAttack;
     float slashEnd;
+    float bonus;
     Vector3 slashBaseScale = Vector3.one;
+
+    float CurrentDamage { get { return damage + bonus; } }
 
     void Awake()
     {
@@ -25,6 +31,25 @@ public class PlayerCombat : MonoBehaviour
             slashBaseScale = slashVisual.transform.localScale;
             slashVisual.SetActive(false);
         }
+    }
+
+    void Start() { UpdateText(); }
+
+    public void AddKillBonus()
+    {
+        bonus += killBonus;
+        UpdateText();
+    }
+
+    public void ResetBonus()
+    {
+        bonus = 0f;
+        UpdateText();
+    }
+
+    void UpdateText()
+    {
+        if (damageText != null) damageText.text = "Attack: " + CurrentDamage.ToString("0.0");
     }
 
     void Update()
@@ -43,7 +68,6 @@ public class PlayerCombat : MonoBehaviour
         }
     }
 
-    // follows Wisp every frame so the slash always stays in front
     void LateUpdate()
     {
         if (slashVisual == null || !slashVisual.activeSelf) return;
@@ -75,10 +99,10 @@ public class PlayerCombat : MonoBehaviour
         foreach (var hit in Physics2D.OverlapBoxAll(center, attackSize, 0f))
         {
             Husk h = hit.GetComponent<Husk>();
-            if (h != null) h.TakeHit(damage, transform.position.x);
+            if (h != null) h.TakeHit(CurrentDamage, transform.position.x);
 
             Keeper k = hit.GetComponent<Keeper>();
-            if (k != null) k.TakeHit(damage, transform.position.x);
+            if (k != null) k.TakeHit(CurrentDamage, transform.position.x);
         }
 
         if (slashVisual)

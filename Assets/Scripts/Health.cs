@@ -64,6 +64,8 @@ public class Health : MonoBehaviour
     // Called by the shrine: full health and full flasks, repeatable
     public void Rest()
     {
+        PlayerCombat pc = GetComponent<PlayerCombat>();
+        if (pc != null) pc.ResetBonus();
         current = maxHealth;
         flasks = maxFlasks;
         UpdateBar();
@@ -103,7 +105,7 @@ public class Health : MonoBehaviour
 
         Keeper boss = FindFirstObjectByType<Keeper>();
         if (boss != null) boss.ResetBoss();
-        foreach (Husk husk in FindObjectsByType<Husk>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (Husk husk in FindObjectsByType<Husk>(FindObjectsInactive.Include))
             husk.ResetHusk();
     }
 }
