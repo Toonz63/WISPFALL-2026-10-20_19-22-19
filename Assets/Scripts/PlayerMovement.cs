@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 6f;
-    public float jumpForce = 9f;
+    public float jumpForce = 7f;
     public LayerMask groundLayer;
     public int Facing = 1;
     public bool canDoubleJump = false;
