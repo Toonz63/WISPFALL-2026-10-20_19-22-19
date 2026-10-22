@@ -12,11 +12,13 @@ public class PlayerCombat : MonoBehaviour
 
     PlayerMovement move;
     float nextAttack;
+    PlayerAnimator pa;
 
     void Awake()
     {
         move = GetComponent<PlayerMovement>();
         if (slashVisual) slashVisual.SetActive(false);
+        pa = GetComponent<PlayerAnimator>();
     }
 
     void Update()
@@ -37,6 +39,7 @@ public class PlayerCombat : MonoBehaviour
 
     void Attack()
     {
+        if (pa != null) pa.PlayAttack();
         Vector2 center = (Vector2)transform.position +
                          new Vector2(attackOffset.x * move.Facing, attackOffset.y);
 
