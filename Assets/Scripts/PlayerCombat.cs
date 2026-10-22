@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections;
 
 public class PlayerCombat : MonoBehaviour
 {
@@ -8,17 +7,24 @@ public class PlayerCombat : MonoBehaviour
     public float attackCooldown = 0.4f;
     public Vector2 attackOffset = new Vector2(0.9f, 0f);
     public Vector2 attackSize = new Vector2(1.2f, 1f);
+    public float slashDuration = 0.12f;
     public GameObject slashVisual;
 
     PlayerMovement move;
-    float nextAttack;
     PlayerAnimator pa;
+    float nextAttack;
+    float slashEnd;
+    Vector3 slashBaseScale = Vector3.one;
 
     void Awake()
     {
         move = GetComponent<PlayerMovement>();
-        if (slashVisual) slashVisual.SetActive(false);
         pa = GetComponent<PlayerAnimator>();
+        if (slashVisual)
+        {
+            slashBaseScale = slashVisual.transform.localScale;
+            slashVisual.SetActive(false);
+        }
     }
 
     void Update()
@@ -37,11 +43,34 @@ public class PlayerCombat : MonoBehaviour
         }
     }
 
+    // follows Wisp every frame so the slash always stays in front
+    void LateUpdate()
+    {
+        if (slashVisual == null || !slashVisual.activeSelf) return;
+
+        if (Time.time >= slashEnd)
+        {
+            slashVisual.SetActive(false);
+            return;
+        }
+
+        slashVisual.transform.position = SlashCenter();
+        Vector3 s = slashBaseScale;
+        s.x = Mathf.Abs(s.x) * move.Facing;
+        slashVisual.transform.localScale = s;
+    }
+
+    Vector2 SlashCenter()
+    {
+        return (Vector2)transform.position +
+               new Vector2(attackOffset.x * move.Facing, attackOffset.y);
+    }
+
     void Attack()
     {
         if (pa != null) pa.PlayAttack();
-        Vector2 center = (Vector2)transform.position +
-                         new Vector2(attackOffset.x * move.Facing, attackOffset.y);
+
+        Vector2 center = SlashCenter();
 
         foreach (var hit in Physics2D.OverlapBoxAll(center, attackSize, 0f))
         {
@@ -52,14 +81,11 @@ public class PlayerCombat : MonoBehaviour
             if (k != null) k.TakeHit(damage, transform.position.x);
         }
 
-        if (slashVisual) StartCoroutine(ShowSlash(center));
-    }
-
-    IEnumerator ShowSlash(Vector2 center)
-    {
-        slashVisual.transform.position = center;
-        slashVisual.SetActive(true);
-        yield return new WaitForSeconds(0.1f);
-        slashVisual.SetActive(false);
+        if (slashVisual)
+        {
+            slashEnd = Time.time + slashDuration;
+            slashVisual.SetActive(true);
+            slashVisual.transform.position = center;
+        }
     }
 }

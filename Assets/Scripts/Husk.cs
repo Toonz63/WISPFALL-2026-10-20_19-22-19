@@ -24,18 +24,27 @@ public class Husk : MonoBehaviour
     int dir = 1;
     bool dealtDamage;
 
+    int startHealth;
+    Vector3 startPos;
+    Vector3 startScale;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         baseColor = sr.color;
         startX = transform.position.x;
+        startHealth = health;
+        startPos = transform.position;
+        startScale = transform.localScale;
         GameObject p = GameObject.FindWithTag("Player");
         if (p != null) player = p.transform;
     }
 
     void Update()
     {
+        if (player == null) return;
+
         switch (state)
         {
             case State.Patrol:
@@ -43,8 +52,7 @@ public class Husk : MonoBehaviour
                 else if (transform.position.x < startX - patrolRange) dir = 1;
                 rb.linearVelocity = new Vector2(dir * patrolSpeed, rb.linearVelocity.y);
 
-                if (player != null &&
-                    Vector2.Distance(player.position, transform.position) <= aggroRange)
+                if (Vector2.Distance(player.position, transform.position) <= aggroRange)
                 {
                     state = State.Telegraph;
                     stateEnd = Time.time + telegraphTime;
@@ -123,7 +131,6 @@ public class Husk : MonoBehaviour
         rb.simulated = false;
 
         float t = 0f;
-        Vector3 startScale = transform.localScale;
         while (t < 0.5f)
         {
             t += Time.deltaTime;
@@ -132,6 +139,23 @@ public class Husk : MonoBehaviour
             transform.localScale = startScale * (1f + 0.5f * k);
             yield return null;
         }
-        Destroy(gameObject);
+
+        gameObject.SetActive(false);   // hidden instead of destroyed, so it can come back
+    }
+
+    // Called when the player respawns
+    public void ResetHusk()
+    {
+        gameObject.SetActive(true);
+        StopAllCoroutines();
+        health = startHealth;
+        transform.position = startPos;
+        transform.localScale = startScale;
+        sr.color = baseColor;
+        GetComponent<Collider2D>().enabled = true;
+        rb.simulated = true;
+        rb.linearVelocity = Vector2.zero;
+        dir = 1;
+        state = State.Patrol;
     }
 }

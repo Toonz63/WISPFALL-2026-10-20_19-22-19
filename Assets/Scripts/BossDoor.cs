@@ -8,12 +8,12 @@ public class BossDoor : MonoBehaviour
     Vector3 closedPos, hiddenPos;
     bool closed;
     Collider2D col;
-    SpriteRenderer sr;
+    SpriteRenderer[] renderers;
 
     void Awake()
     {
         col = GetComponent<Collider2D>();
-        sr = GetComponent<SpriteRenderer>();
+        renderers = GetComponentsInChildren<SpriteRenderer>();
         closedPos = transform.position;
         hiddenPos = closedPos + Vector3.up * dropDistance;
         Hide();
@@ -30,7 +30,7 @@ public class BossDoor : MonoBehaviour
         if (closed) return;
         closed = true;
         transform.position = hiddenPos;
-        sr.enabled = true;
+        SetVisible(true);
         col.enabled = true;
     }
 
@@ -43,7 +43,12 @@ public class BossDoor : MonoBehaviour
     void Hide()
     {
         transform.position = hiddenPos;
-        sr.enabled = false;
+        SetVisible(false);
         col.enabled = false;
+    }
+
+    void SetVisible(bool v)
+    {
+        foreach (var r in renderers) r.enabled = v;
     }
 }

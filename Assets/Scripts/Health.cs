@@ -103,5 +103,7 @@ public class Health : MonoBehaviour
 
         Keeper boss = FindFirstObjectByType<Keeper>();
         if (boss != null) boss.ResetBoss();
+        foreach (Husk husk in FindObjectsByType<Husk>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            husk.ResetHusk();
     }
 }
