@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
+using System.Collections.Generic;
 
 public class Health : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class Health : MonoBehaviour
     Vector3 respawnPoint;
     Rigidbody2D rb;
     bool dead;
+    HashSet<Husk> savedDeadHusks = new HashSet<Husk>();
 
     void Awake() { rb = GetComponent<Rigidbody2D>(); }
 
@@ -41,7 +43,11 @@ public class Health : MonoBehaviour
         if (kb != null && kb.qKey.wasPressedThisFrame) UseFlask();
     }
 
-    public void SetCheckpoint(Vector3 pos) { respawnPoint = pos; }
+    public void SetCheckpoint(Vector3 pos) 
+    { 
+        respawnPoint = pos;
+        SaveProgress();
+    }
 
     public void TakeDamage(int amount)
     {
@@ -109,6 +115,15 @@ public class Health : MonoBehaviour
         Keeper boss = FindFirstObjectByType<Keeper>();
         if (boss != null) boss.ResetBoss();
         foreach (Husk husk in FindObjectsByType<Husk>(FindObjectsInactive.Include))
-            husk.ResetHusk();
+            if (!savedDeadHusks.Contains(husk)) husk.ResetHusk();
+    }
+    public void SaveProgress()
+    {
+        savedDeadHusks.Clear();
+        foreach (Husk husk in FindObjectsByType<Husk>(FindObjectsInactive.Include))
+            if (!husk.gameObject.activeSelf) savedDeadHusks.Add(husk);
+
+        PlayerCombat pc = GetComponent<PlayerCombat>();
+        if (pc != null) pc.SaveBonus();
     }
 }

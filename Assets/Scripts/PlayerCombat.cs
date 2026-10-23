@@ -18,6 +18,7 @@ public class PlayerCombat : MonoBehaviour
     float nextAttack;
     float slashEnd;
     float bonus;
+    float savedBonus;
     Vector3 slashBaseScale = Vector3.one;
 
     float CurrentDamage { get { return damage + bonus; } }
@@ -41,9 +42,11 @@ public class PlayerCombat : MonoBehaviour
         UpdateText();
     }
 
+    public void SaveBonus() { savedBonus = bonus; }
+
     public void ResetBonus()
     {
-        bonus = 0f;
+        bonus = savedBonus;
         UpdateText();
     }
 
