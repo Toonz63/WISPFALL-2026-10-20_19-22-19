@@ -18,4 +18,4 @@ Solo project for Homework 02 (2D Mini Game) by Phoenix Toon.
 - "73BPM - Piano stem - Cat stride in wet grass 1" by Sadiquecat (CC0): https://freesound.org/people/Sadiquecat/sounds/754414/
 
 ## Generative AI use
-I used Claude (Anthropic's AI assistant) while building this game. It helped me plan the project, gave me step-by-step Unity editor instructions, explained errors, and drafted C# scripts that I pasted into the project, tested, and debugged. I made the design decisions (the game idea, the enemy and boss behavior, the shrine/flask system, the attack bonus, the level layout), built the scene and animations in Unity, found and reported the bugs, and picked all of the assets. No AI-generated art or audio is in the game.
+I used Claude (Anthropic's AI assistant) while building this game. It helped me fix errors, and drafted C# scripts to fix the errors, tested, and debugged. I made the design decisions (the game idea, the enemy and boss behavior, the shrine/flask system, the attack bonus, the level layout), built the scene and animations in Unity, found and reported the bugs, and picked all of the assets. No AI-generated art or audio is in the game.
